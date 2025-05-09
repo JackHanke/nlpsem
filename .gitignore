@@ -176,3 +176,6 @@ cython_debug/
 # proj specific
 data/*
 !data/.gitkeep
+
+distributions/*
+!distributions/.gitkeep
