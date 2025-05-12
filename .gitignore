@@ -179,3 +179,9 @@ data/*
 
 distributions/*
 !distributions/.gitkeep
+
+writeup/*
+!writeup/paper.pdf
+!writeup/paper.tex
+!writeup/acl.sty
+!writeup/custom.bib
