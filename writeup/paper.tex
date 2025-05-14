@@ -193,37 +193,37 @@ We also report the lowest rank words and tokens for each tokenizer and corpus to
         3 & i & and & and & and & she & and \\
         \hline
     \end{tabular}
-    \caption{Summary of most common words \& tokens for each corpus, where the left subcolumn is bookscorpus and the right subcolumn MiniPile, \textit{not} including control tokens and punctuation. A majority of these words are considered \textit{function words} in linguistics literature.}
+    \caption{Summary of most common words \& tokens for each corpus, where the left subcolumn is bookscorpus and the right subcolumn MiniPile, \textit{not} including control tokens and punctuation. All of these words are considered \textit{function words} in linguistics literature.}
     \label{tbl:token ranks no control}
 \end{table}
 
 Finally, we report the Kolmogorov-Smirnov test statistics for fitted Zipf-Mandelbrot, Exponential, and log-normal distributions in Table \ref{tbl:kstest}. 
 
-\begin{table}
-    \centering
-    \begin{tabular}{|c|c|c|c|c|c|c|}
-        \hline
-        \textbf{Distribution} & \multicolumn{2}{c|}{\textbf{Words}} & \multicolumn{2}{c|}{\textbf{RoBERTa}} & \multicolumn{2}{c|}{\textbf{GPT-4}}  \\
-        \hline
-        Zipf &  &  &  &  &  &  \\
-        \hline
-        Exponential & 0.87 & 0.81 & 0.58 & 0.48 & 0.72 & 0.56 \\
-        \hline
-        log-normal & 0.38 & 0.45 & 0.03 & 0.05 & 0.40 & 0.28 \\
-        \hline
-    \end{tabular}
-    \caption{Kolmogorov-Smirnov test statistics for distribution fit, where the left subcolumn is bookscorpus and the right subcolumn MiniPile}
-    \label{tbl:kstest}
-\end{table}
+% \begin{table}
+%     \centering
+%     \begin{tabular}{|c|c|c|c|c|c|c|}
+%         \hline
+%         \textbf{Distribution} & \multicolumn{2}{c|}{\textbf{Words}} & \multicolumn{2}{c|}{\textbf{RoBERTa}} & \multicolumn{2}{c|}{\textbf{GPT-4}}  \\
+%         \hline
+%         Zipf &  &  &  &  &  &  \\
+%         \hline
+%         Exponential & 0.87 & 0.81 & 0.58 & 0.48 & 0.72 & 0.56 \\
+%         \hline
+%         log-normal & 0.38 & 0.45 & 0.03 & 0.05 & 0.40 & 0.28 \\
+%         \hline
+%     \end{tabular}
+%     \caption{Kolmogorov-Smirnov test statistics for distribution fit, where the left subcolumn is bookscorpus and the right subcolumn MiniPile}
+%     \label{tbl:kstest}
+% \end{table}
 
 
 \section{Analysis}
 
-The BPE algorithm builds a finite vocabulary by directly referencing the frequency of subwords and maps everything not captured to a "catch-all" unknown token. Despite this, these generated vocabularies are still Zipfian up to the rarest few tokens. Moreover, the tokenizers this algorithm produces creates Zipfian distributed tokens outside of the corpus it is trained on. When considering all possible tokens, the most common tokens tend to be punctuation, newline characters, and control tokens. Excluding punctuation and special tokens, we recover the known most common English words. 
+The BPE algorithm builds a finite vocabulary by directly referencing the frequency of subwords and maps everything not captured to a ``catch-all" unknown token. Despite this, these generated vocabularies are still Zipfian up to the rarest few tokens. Moreover, the tokenizers this algorithm produces creates Zipfian distributed tokens outside of the corpus it is trained on. When considering all possible tokens, the most common tokens tend to be punctuation, newline characters, and control tokens. Excluding punctuation and special tokens, we recover the known most common English words. 
 
 \section{Conclusions \& Future Work}
 
-Noticeable theoretical work has been done in service of explaining Zipf's law for language \cite{li1992}. Most significant to the discussion was Belecitch's \textit{On the statistical laws of linguistic distributions}\cite{Belevitch1959}, in which the author shows the first order approximation of the rank ordering of many statistical distributions are all Zipfian. Can this approximation be shown to be invariant under the byte pair encoding transformation?
+Noticeable theoretical work has been done in service of explaining Zipf's law for language \cite{li1992}. Most significant was Belecitch's \textit{On the statistical laws of linguistic distributions}\cite{Belevitch1959}, in which the author shows the first order approximation of the rank ordering of many statistical distributions are all Zipfian. Can this approximation be shown to be invariant under the byte pair encoding transformation?
 
 % Bibliography entries for the entire Anthology, followed by custom entries
 %\bibliography{anthology,custom}
