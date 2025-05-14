@@ -180,8 +180,10 @@ data/*
 distributions/*
 !distributions/.gitkeep
 
+# only important latex files
 writeup/*
 !writeup/paper.pdf
 !writeup/paper.tex
-!writeup/acl.sty
 !writeup/custom.bib
+!writeup/acl.sty
+!writeup/acl_natbib.bst
