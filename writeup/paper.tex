@@ -219,19 +219,11 @@ Finally, we report the Kolmogorov-Smirnov test statistics for fitted Zipf-Mandel
 
 \section{Analysis}
 
-Despite the BPE algorithm building a vocabulary by directly referencing the frequency of subwords, these vocabularies are still Zipfian, and follow the word frequency distribution up to the rarest few tokens. Moreover, the tokenizers this algorithm produces creates Zipfian distributed tokens outside of the corpus it is trained on. When considering all possible tokens, the most common tokens tend to be punctuation, newline characters, and control tokens. Excluding punctuation and special tokens, we recover the known most common English words. 
+The BPE algorithm builds a finite vocabulary by directly referencing the frequency of subwords and maps everything not captured to a "catch-all" unknown token. Despite this, these generated vocabularies are still Zipfian up to the rarest few tokens. Moreover, the tokenizers this algorithm produces creates Zipfian distributed tokens outside of the corpus it is trained on. When considering all possible tokens, the most common tokens tend to be punctuation, newline characters, and control tokens. Excluding punctuation and special tokens, we recover the known most common English words. 
 
 \section{Conclusions \& Future Work}
 
-Noticeable theoretical work has been done in service of explaining Zipf's law for language \cite{li1992} 
-
-\textit{On the statistical laws of linguistic distributions}\cite{Belevitch1959}
-
-Are a 
-
-TODO
-
-How do token vocabularies differ from english vocabularies? Fixed vocabulary size, catchall token, functional tokens
+Noticeable theoretical work has been done in service of explaining Zipf's law for language \cite{li1992}. Most significant to the discussion was Belecitch's \textit{On the statistical laws of linguistic distributions}\cite{Belevitch1959}, in which the author shows the first order approximation of the rank ordering of many statistical distributions are all Zipfian. Can this approximation be shown to be invariant under the byte pair encoding transformation?
 
 % Bibliography entries for the entire Anthology, followed by custom entries
 %\bibliography{anthology,custom}
