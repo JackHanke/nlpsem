@@ -63,8 +63,8 @@
 %         Author 2 \\ Address line \\ ... \\ Address line \And
 %         Author 3 \\ Address line \\ ... \\ Address line}
 
-\author{Jack Hanke  Daniel Plotkin \\ 
-        {\bf Nicole Birova}  {\bf David Demeter} \\
+\author{Jack Hanke \qquad Daniel Plotkin \\ 
+        {\bf Nicole Birova} \qquad {\bf David Demeter} \\
         Northwestern University }
 
 % \author{Jack Hanke \\
@@ -126,7 +126,7 @@ A majority of large language models ingest word fragments produced by a data com
 \section{Introduction}
 \label{section:intro}
 
-George Zipf in his hallmark \textit{The Psycho-Biology of Language} \cite{Zip35} introduced the remarkable trend that the word frequencies in many human languages exhibit the same power law distribution. Specifically, Zipf said the number of times a word appears in a corpus is proportional to the word's frequency rank. Mathematically, Zipf's laws states
+George Zipf in his hallmark \textit{The Psycho-Biology of Language} \cite{Zip35} introduced the trend that the word frequencies in many human languages exhibit the same power law distribution. Specifically, Zipf said the number of times a word appears in a corpus is proportional to the word's rank. Mathematically, Zipf's laws states
 
 \begin{equation}
     \mbox{word frequency} \propto \frac{1}{\mbox{word rank}}.
@@ -141,25 +141,29 @@ A more descriptive model of word frequency that is more commonly referenced in l
 
 where $a,b$ are fitted parameters. We say a distribution that follows the trend in Equation \ref{eq:zipfmandelbrot} with $a \approx 1$ is \textit{Zipf distributed}, or simply \textit{Zipfian}.
 
-The accuracy of the trend in Equation \ref{eq:zipfmandelbrot} has been examined in $10^8$ English words in \cite{cancho2000}, over 50 languages in \cite{yu2018zipfslaw50languages}, and written-versus-spoken corpuses in \cite{lin2015scalinglawshumanspeech}. Each of these studies demonstrate that Zipf's law is generally exhibitted for common and somewhat-uncommon words, but rare words (words with high rank) appear less frequently than predicted.\footnote{Some of these studies also find that extremely common words appear slighly more commonly than the Zipfian prediction.} This deviation is shown to be statistically significant, and appears as two trendlines in the log-log plot. In English corpuses, this transition is found around the $10^5$\textit{-th} ranked word. The authors further explore the linguistic relevance and universality of these multiple regimes of words. 
+The accuracy of the trend in Equation \ref{eq:zipfmandelbrot} has been examined in $10^8$ English words in \cite{cancho2000}, over 50 languages in \cite{yu2018zipfslaw50languages}, and written-versus-spoken corpuses in \cite{lin2015scalinglawshumanspeech}. Each of these studies demonstrate that Zipf's law is generally exhibitted for common and somewhat-uncommon words, but rare words (words with high rank) appear less frequently than predicted.\footnote{Some of these studies also find that extremely common words appear slighly more commonly than the Zipfian prediction.} This deviation is shown to be statistically significant, and appears as two linear trends in log-log rank frequency plots. This transition is found around the $10^4$\textit{-th} ranked word \cite{cancho2000} \cite{yu2018zipfslaw50languages}. The authors further explore the linguistic relevance and universality of these multiple regimes of words. 
 
-Nearly a century after Zipf's discovery, large language models (LLMs) generate text comparable to human communication. However, unlike humans, LLMs digest text using a fixed vocabulary of word fragments called \textit{tokens}. The mapping between natural language and tokens is most commonly computed using the \textit{byte pair encoding (BPE) algorithm} \cite{bpegage} over some large training corpus. Byte pair encoding identifies the most frequent pair of letters, and creates a new token in the "token vocabulary" to replace that pair. Iterating this procedure until some fixed vocabulary size is reached creates the vocabulary of tokens. Finally, any sequence that does not map to one of the derived tokens is labelled with the ``unknown'' token.
+Nearly a century after Zipf's discovery, large language models (LLMs) generate text comparable to human communication. However, unlike humans, LLMs digest text using a fixed vocabulary of word fragments called \textit{tokens}. The mapping between natural language and tokens is most commonly computed using the \textit{byte pair encoding (BPE) algorithm} introduced by Gage \cite{bpegage} and popluarized in natural laguage processing by \cite{sennrich2016neuralmachinetranslationrare}. Modern tokenizers are \textit{byte-level} \cite{radford2019language}, where the indivisible units of natural language are bytes in the Unicode representation of a specific character.
 
 When considering these ideas in tandem, a natural question arises: given a corpus that appears Zipfian, how does the tokenization process affect this trend?
 
 \section{Methods}
 
-To explore this question, we examine two modern tokenizers. We choose the tokenizer for the RoBERTa language model \cite{liu2019robertarobustlyoptimizedbert}, as the training data is publicly known. This allows us to conduct frequency analyses on corpuses that are on and off-distribution for the tokenizer. We also choose to compare our results with the tokenizer for the GPT-4 language model \cite{openai2024gpt4technicalreport} as a representative of industry-scale byte pair encoding. 
+To explore this question, we examine two modern byte-level BPE tokenizers. We choose the tokenizer for the RoBERTa language model \cite{liu2019robertarobustlyoptimizedbert}, which has a vocabulary size of 50,265. As the training data is publicly known, this allows us to conduct frequency analyses on corpuses that are on and off-distribution for the tokenizer.  We also choose to compare our results with the 200,019 vocab GPT-4o tokenizer \cite{openai2024gpt4technicalreport}, as a representative of industry-scale byte pair encoding. 
 
-We choose two corpuses based on RoBERTa's training data. We choose the 4.4GB bookscorpus dataset \cite{zhu2015aligningbooksmoviesstorylike}, which is within RoBERTa's training data, and the 5.6GB MiniPile dataset \cite{kaddour2023minipilechallengedataefficientlanguage}, which is not. Note that it is likely that the GPT-4 tokenizer was trained (in-part) on both of these corpuses.
+We examine the 4.4GB bookscorpus dataset \cite{zhu2015aligningbooksmoviesstorylike}, which is within RoBERTa's training data, and the 5.6GB MiniPile dataset \cite{kaddour2023minipilechallengedataefficientlanguage}, which is not. Note that it is likely that the GPT-4o tokenizer was trained (in-part) on both of these corpuses.
 
-We compute the word and token frequency for both tokenizers on each corpus, where we define a word as anything separated by a space. We then compute the data's Kolmogorov-Smirnov goodness-of-fit statistic for the fitted Zipf distribution, and compare to that for a fitted exponential and log-normal distribution. 
+We compute the word and token frequency for both tokenizers on each corpus, where we define a word as anything separated by the space character (U+0020). We then compute the data's Kolmogorov-Smirnov goodness-of-fit statistic for the fitted Zipf distribution, and compare to that for fitted exponential and log-normal distributions. 
 
 We do not remove any words or tokens from consideration unless otherwise stated, as to a language model all non-padding tokens are treated the same in training. 
 
 \section{Results}
 
-We find that token vocabularies are remarkably Zipfian, excluding extremely rare tokens. This holds true for both tokenizers and both corpuses studied, including the out-of-distribution text. In the log-log plots in Figure \ref{fig:experiments}, we find a clear linear trend over a large number of words and tokens. We only see deviations from the Zipfian trend for the final few tokens in the RoBERTa tokenizer for both corpuses and the GPT-4 tokenizer for the MiniPile corpus. However, the GPT-4 tokenizer trend on the bookscorpus seems to deviate more dramatically, similar to the multiple regime studies mentioned in Section \ref{section: intro}.
+We find that token vocabularies are remarkably Zipfian, excluding extremely rare tokens. This holds true for both tokenizers and both corpuses studied, including the out-of-distribution text. 
+
+For bookscorpus, we find 1.3M distinct words, 31,729 distinct RoBERTa tokens, and 12,859 distinct GPT-4o tokens. For MiniPile, we find 32M distinct words, 50,165 distinct RoBERTa tokens, and 178,416 distinct GPT-4o tokens. 
+
+We plot the log-log rank frequencies for each corpus in Figure \ref{fig:experiments}. We find a clear linear trend over a large number of words and tokens. We only see deviations from the Zipfian trend for the final few tokens in the RoBERTa tokenizer for both corpuses and the GPT-4o tokenizer for the MiniPile corpus. However, the GPT-4o tokenizer trend on the bookscorpus seems to deviate more dramatically, similar to the multiple regime studies mentioned in Section \ref{section:intro}.
 
 \begin{figure}[t]
   \includegraphics[width=\columnwidth]{../visualizations/bookscorpusfreq.png}
@@ -170,11 +174,11 @@ We find that token vocabularies are remarkably Zipfian, excluding extremely rare
 
 We also report the lowest rank words and tokens for each tokenizer and corpus to identify trends across models and corpuses. We report these words and tokens both including and excluding control tokens and punctuation, which are summarized in Table \ref{tbl:token ranks} and Table \ref{tbl:token ranks no control} respectively.
 
-\begin{table}
+\begin{table*}
     \centering
     \begin{tabular}{|c|c|c|c|c|c|c|}
         \hline
-        \textbf{Rank} & \multicolumn{2}{c|}{\textbf{Word}} & \multicolumn{2}{c|}{\textbf{RoBERTa}} & \multicolumn{2}{c|}{\textbf{GPT-4}}  \\
+        \textbf{Rank} & \multicolumn{2}{c|}{\textbf{Word}} & \multicolumn{2}{c|}{\textbf{RoBERTa}} & \multicolumn{2}{c|}{\textbf{GPT-4o}}  \\
         \hline
         1 & . & the & <s> & ␣ & `` & , \\
         \hline
@@ -182,16 +186,22 @@ We also report the lowest rank words and tokens for each tokenizer and corpus to
         \hline
         3 & the & and & <\textbackslash s> & . & he & . \\
         \hline
+        -1 & restain & RootDir, & seq & ␣Archdemon & wares & aryny \\
+        \hline
+        -1 & liarliar & homocystinemia & okemon & ␣petertodd & slan & verlening \\
+        \hline
+        -1 & shop-that & halfday & ython & ␣councill & wier & ␣myx \\
+        \hline
     \end{tabular}
-    \caption{Summary of most common words \& tokens for each corpus, where the left subcolumn is bookscorpus and the right subcolumn MiniPile, including control tokens and punctuation}
+    \caption{Summary of most and least common words \& tokens for each corpus, where the left subcolumn is bookscorpus and the right subcolumn is MiniPile, including control tokens and punctuation. A rank of -1 indicates a word or token that appears only once in the given corpus. The space character (Unicode U+0020) is denoted by the `␣' character. }
     \label{tbl:token ranks}
-\end{table}
+\end{table*}
 
 \begin{table}
     \centering
     \begin{tabular}{|c|c|c|c|c|c|c|}
         \hline
-        \textbf{Rank} & \multicolumn{2}{c|}{\textbf{Word}} & \multicolumn{2}{c|}{\textbf{RoBERTa}} & \multicolumn{2}{c|}{\textbf{GPT-4}}  \\
+        \textbf{Rank} & \multicolumn{2}{c|}{\textbf{Word}} & \multicolumn{2}{c|}{\textbf{RoBERTa}} & \multicolumn{2}{c|}{\textbf{GPT-4o}}  \\
         \hline
         1 & the & the & the & the & i & the \\
         \hline
@@ -200,17 +210,17 @@ We also report the lowest rank words and tokens for each tokenizer and corpus to
         3 & i & and & and & and & she & and \\
         \hline
     \end{tabular}
-    \caption{Summary of most common words \& tokens for each corpus, where the left subcolumn is bookscorpus and the right subcolumn MiniPile, \textit{not} including control tokens and punctuation. All of these words are considered \textit{function words} in linguistics literature.}
+    \caption{Summary of most common words \& tokens for each corpus, where the left subcolumn is bookscorpus and the right subcolumn is MiniPile, \textit{not} including control tokens and punctuation. All of these words are considered \textit{function words} in linguistics literature.}
     \label{tbl:token ranks no control}
 \end{table}
 
 Finally, we report the Kolmogorov-Smirnov test statistics for fitted Zipf-Mandelbrot, Exponential, and log-normal distributions in Table \ref{tbl:kstest}. 
 
-\begin{table}
+\begin{table*}
     \centering
     \begin{tabular}{|c|c|c|c|c|c|c|}
         \hline
-        \textbf{Distribution} & \multicolumn{2}{c|}{\textbf{Words}} & \multicolumn{2}{c|}{\textbf{RoBERTa}} & \multicolumn{2}{c|}{\textbf{GPT-4}}  \\
+        \textbf{Distribution} & \multicolumn{2}{c|}{\textbf{Words}} & \multicolumn{2}{c|}{\textbf{RoBERTa}} & \multicolumn{2}{c|}{\textbf{GPT-4o}}  \\
         \hline
         Zipf &  &  &  &  &  &  \\
         \hline
@@ -221,7 +231,7 @@ Finally, we report the Kolmogorov-Smirnov test statistics for fitted Zipf-Mandel
     \end{tabular}
     \caption{Kolmogorov-Smirnov test statistics for distribution fit, where the left subcolumn is bookscorpus and the right subcolumn MiniPile}
     \label{tbl:kstest}
-\end{table}
+\end{table*}
 
 
 \section{Analysis}
