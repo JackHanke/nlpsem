@@ -45,7 +45,7 @@
 %
 % and set <dim> to something 5cm or larger.
 
-\title{Modern Byte Pair Tokenizers are Zipfian}
+\title{Empirical Evidence that Modern Byte Pair Tokenizers are Zipfian}
 
 % Author information can be set in various styles:
 % For several authors from the same institution:
@@ -120,46 +120,46 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-A majority of large language models ingest word fragments produced by a data compression algorithm known as byte pair encoding. This algorithm groups high-frequency letter pairings in natural language into individual units called  \textit{tokens}. A natural question is whether the tokens produced by this pairing process deviate significantly from the source language's frequency distribution. Zipf famously showed that many natural language's frequency distribution follows a power law, commonly known as Zipf's Law. We examine two modern tokenizer's adherence to Zipf's law at the token level. We demonstrate that these tokenizers are Zipfian on two corpuses, and speculate as to why this is.
+A majority of large language models ingest word fragments produced by an algorithm known as byte pair encoding. This algorithm groups high-frequency element pairings in natural language into individual units called \textit{tokens}. A natural question is whether the frequency distribution of the tokens produced by this pairing process deviate significantly from the source language's. Zipf showed that many natural language's frequency distribution follows a power law, commonly known as Zipf's Law. We examine two modern tokenizer's adherence to Zipf's law at the token level. We provide empirical evidence that these tokenizers are Zipfian on two corpuses, and speculate as to why this is. Additionally, we give evidence that Zipfness is preserved over many individual steps of byte pair encoding.
 \end{abstract}
 
 \section{Introduction}
 \label{section:intro}
 
-George Zipf in his hallmark \textit{The Psycho-Biology of Language} \cite{Zip35} introduced the trend that the word frequencies in many human languages exhibit the same power law distribution. Specifically, Zipf said the number of times a word appears in a corpus is proportional to the word's rank. Mathematically, Zipf's laws states
+George Zipf, in \textit{The Psycho-Biology of Language} \cite{Zip35} introduced the trend that the number of occurences of a word, the word's \textit{frequency}, in many human languages exhibit the same power law distribution. Specifically, Zipf said the work frequency in a corpus is proportional to the word's frequency rank, that being
 
 \begin{equation}
     \mbox{word frequency} \propto \frac{1}{\mbox{word rank}}.
 \end{equation}
 
-A more descriptive model of word frequency that is more commonly referenced in linguistics literature is the Zipf-Mandelbrot distribution
+For example, Zipf's law predicts that the second most frequent word will be half as common as the most frequenct word. A more descriptive model of word frequency that is more commonly referenced in linguistics literature is the Zipf-Mandelbrot distribution, written
 
 \begin{equation}
-    \mbox{word frequency} \propto \frac{1}{(\mbox{word rank} + b)^a}.
+    \mbox{word frequency} \propto \frac{1}{(\mbox{word rank} + b)^a}, 
     \label{eq:zipfmandelbrot}
 \end{equation}
 
 where $a,b$ are fitted parameters. We say a distribution that follows the trend in Equation \ref{eq:zipfmandelbrot} with $a \approx 1$ is \textit{Zipf distributed}, or simply \textit{Zipfian}.
 
-The accuracy of the trend in Equation \ref{eq:zipfmandelbrot} has been examined in $10^8$ English words in \cite{cancho2000}, over 50 languages in \cite{yu2018zipfslaw50languages}, and written-versus-spoken corpuses in \cite{lin2015scalinglawshumanspeech}. Each of these studies demonstrate that Zipf's law is generally exhibitted for common and somewhat-uncommon words, but rare words (words with high rank) appear less frequently than predicted.\footnote{Some of these studies also find that extremely common words appear slighly more commonly than the Zipfian prediction.} This deviation is shown to be statistically significant, and appears as two linear trends in log-log rank frequency plots. This transition is found around the $10^4$\textit{-th} ranked word \cite{cancho2000} \cite{yu2018zipfslaw50languages}. The authors further explore the linguistic relevance and universality of these multiple regimes of words. 
+The accuracy of the trend in Equation \ref{eq:zipfmandelbrot} has been examined in $10^8$ English words in \cite{cancho2000}, over 50 languages in \cite{yu2018zipfslaw50languages}, and written-versus-spoken corpuses in \cite{lin2015scalinglawshumanspeech}. Each of these studies demonstrate that Zipf's law is generally exhibitted for common and somewhat-uncommon words, but rare words (words with high rank) appear less frequently than predicted. This deviation is shown to be statistically significant, and appears as two linear trends in log-log rank frequency plots. This transition is found around the $10^4$\textit{-th} ranked word \cite{cancho2000} \cite{yu2018zipfslaw50languages}. The authors further explore the linguistic relevance and universality of these multiple trends of words. 
 
-Nearly a century after Zipf's discovery, large language models (LLMs) generate text comparable to human communication. However, unlike humans, LLMs digest text using a fixed vocabulary of word fragments called \textit{tokens}. The mapping between natural language and tokens is most commonly computed using the \textit{byte pair encoding (BPE) algorithm} introduced by Gage \cite{bpegage} and popluarized in natural laguage processing by \cite{sennrich2016neuralmachinetranslationrare}. Modern tokenizers are \textit{byte-level} \cite{radford2019language}, where the indivisible units of natural language are bytes in the Unicode representation of a specific character.
+Nearly a century after Zipf's discovery, large language models (LLMs) generate text comparable to human communication \cite{llmturingtest}. LLMs digest text using a fixed vocabulary of word fragments called \textit{tokens}. The mapping between natural language and tokens is most commonly computed using the \textit{byte pair encoding (BPE) algorithm} introduced by Gage \cite{bpegage} for file compression. An adjustment of BPE was popluarized for natural laguage processing by \cite{sennrich2016neuralmachinetranslationrare}, wherein instead of seeking to optimally compress a corpus of text, it instead seeks to map a corpus to a small fixed vocabulary. In this paper, we consider the natural language processing variant of the algorithm. For BPE, the \textit{elements} of a corpus are what portion of the text is paired in the first iteration of the algorithm. Elements can be words, phonemes, or letters. Modern tokenizers use the bytes of the Unicode representation as the elements, and so are called \textit{byte-level} tokenizers \cite{radford2019language}. 
 
-When considering these ideas in tandem, a natural question arises: given a corpus that appears Zipfian, how does the tokenization process affect this trend?
+When considering these ideas in tandem, a natural question arises: given a corpus that appears Zipfian, how does the BPE tokenization process affect this trend?
 
 \section{Methods}
 
-To explore this question, we examine two modern byte-level BPE tokenizers. We choose the tokenizer for the RoBERTa language model \cite{liu2019robertarobustlyoptimizedbert}, which has a vocabulary size of 50,265. As the training data is publicly known, this allows us to conduct frequency analyses on corpuses that are on and off-distribution for the tokenizer.  We also choose to compare our results with the 200,019 vocab GPT-4o tokenizer \cite{openai2024gpt4technicalreport}, as a representative of industry-scale byte pair encoding. 
+To explore this question, we examine two modern byte-level BPE tokenizers. We choose the tokenizer for the RoBERTa language model \cite{liu2019robertarobustlyoptimizedbert}, which has a vocabulary size of 50,265. As the training data is publicly known, this allows us to conduct frequency analyses on corpuses that are on and off-distribution for the tokenizer.  We also compare our results with the 200,019 vocab GPT-4o tokenizer \cite{openai2024gpt4technicalreport}, as a representative of industry-scale byte pair encoding. 
 
-We examine the 4.4GB bookscorpus dataset \cite{zhu2015aligningbooksmoviesstorylike}, which is within RoBERTa's training data, and the 5.6GB MiniPile dataset \cite{kaddour2023minipilechallengedataefficientlanguage}, which is not. Note that it is likely that the GPT-4o tokenizer was trained (in-part) on both of these corpuses.
+We examine the 4.4GB bookscorpus dataset \cite{zhu2015aligningbooksmoviesstorylike}, which is within RoBERTa's training data, and the 5.6GB MiniPile dataset \cite{kaddour2023minipilechallengedataefficientlanguage}, which is not.
 
-We compute the word and token frequency for both tokenizers on each corpus, where we define a word as anything separated by the space character (U+0020). We then compute the data's Kolmogorov-Smirnov goodness-of-fit statistic for the fitted Zipf distribution, and compare to that for fitted exponential and log-normal distributions. 
+We compute the byte, word, and token frequency for both tokenizers on each corpus, where we define a word as anything separated by the space character (U+0020). We then compute the data's Kolmogorov-Smirnov goodness-of-fit statistic for the fitted Zipf distribution, and compare the fit to fitted exponential and log-normal distributions. We do not remove any words or tokens from consideration unless otherwise stated.
 
-We do not remove any words or tokens from consideration unless otherwise stated, as to a language model all non-padding tokens are treated the same in training. 
+Additionally, we create a synthetic dataset of $10^5$ samples from a Zipf distribution alphabet of size $100$ to examine how the distribution deviates from Zipf over successive steps of BPE. 
 
 \section{Results}
 
-We find that token vocabularies are remarkably Zipfian, excluding extremely rare tokens. This holds true for both tokenizers and both corpuses studied, including the out-of-distribution text. 
+We find that token vocabularies are strongly Zipfian, excluding extremely rare tokens. This holds true for both tokenizers and both corpuses studied, including the out-of-distribution text. 
 
 For bookscorpus, we find 1.3M distinct words, 31,729 distinct RoBERTa tokens, and 12,859 distinct GPT-4o tokens. For MiniPile, we find 32M distinct words, 50,165 distinct RoBERTa tokens, and 178,416 distinct GPT-4o tokens. 
 
@@ -193,7 +193,7 @@ We also report the lowest rank words and tokens for each tokenizer and corpus to
         -1 & shop-that & halfday & ython & ␣councill & wier & ␣myx \\
         \hline
     \end{tabular}
-    \caption{Summary of most and least common words \& tokens for each corpus, where the left subcolumn is bookscorpus and the right subcolumn is MiniPile, including control tokens and punctuation. A rank of -1 indicates a word or token that appears only once in the given corpus. The space character (Unicode U+0020) is denoted by the `␣' character. }
+    \caption{Summary of most and least common words \& tokens for each corpus, where the left subcolumn is bookscorpus and the right subcolumn is MiniPile, \textit{including} control tokens and punctuation. A rank of -1 indicates a word or token that appears only once in the given corpus. The space character (Unicode U+0020) is denoted by the `␣' character. }
     \label{tbl:token ranks}
 \end{table*}
 
@@ -210,11 +210,11 @@ We also report the lowest rank words and tokens for each tokenizer and corpus to
         3 & i & and & and & and & she & and \\
         \hline
     \end{tabular}
-    \caption{Summary of most common words \& tokens for each corpus, where the left subcolumn is bookscorpus and the right subcolumn is MiniPile, \textit{not} including control tokens and punctuation. All of these words are considered \textit{function words} in linguistics literature.}
+    \caption{Summary of most common words \& tokens for each corpus, where the left subcolumn is bookscorpus and the right subcolumn is MiniPile, \textit{excluding} control tokens and punctuation. All of these words are considered \textit{function words} in linguistics literature.}
     \label{tbl:token ranks no control}
 \end{table}
 
-Finally, we report the Kolmogorov-Smirnov test statistics for fitted Zipf-Mandelbrot, Exponential, and log-normal distributions in Table \ref{tbl:kstest}. 
+We report the Kolmogorov-Smirnov test statistics for fitted Zipf-Mandelbrot, Exponential, and log-normal distributions on $10^5$ samples from the rank-frequency data in Table \ref{tbl:kstest}. 
 
 \begin{table*}
     \centering
@@ -233,14 +233,25 @@ Finally, we report the Kolmogorov-Smirnov test statistics for fitted Zipf-Mandel
     \label{tbl:kstest}
 \end{table*}
 
+Figure \ref{fig:theoryexperiments} shows the mean squared error (MSE) between the Zipfian prediction and successive applications of a single step of BPE over the Zipfian synthetic dataset. 
+
+\begin{figure}[t]
+  \includegraphics[width=\columnwidth]{../visualizations/zipfnessovertime.png}
+  \caption{Mean Squared Error from Zipf prediction of BPE applied to $10^5$ samples of a synthetic Zipf-distributed corpus of $100$ elements}
+  \label{fig:theoryexperiments}
+\end{figure}
 
 \section{Analysis}
 
-The BPE algorithm builds a finite vocabulary by directly referencing the frequency of subwords and maps everything not captured to a ``catch-all" unknown token. Despite this, these generated vocabularies are still Zipfian up to the rarest few tokens. Moreover, the tokenizers this algorithm produces creates Zipfian distributed tokens outside of the corpus it is trained on. When considering all possible tokens, the most common tokens tend to be punctuation, newline characters, and control tokens. Excluding punctuation and special tokens, we recover the known most common English words. 
+We demonstrate a strong Zipfian trend in all tokenizers and corpuses studied, regardless of whether or not the tokenizer was trained on a given corpus. Deviations from the Zipf prediction only appear for the final few tokens. Over the token vocabulary, the most common tokens tend to be punctuation, newline characters, and control tokens. Excluding punctuation and special tokens, we recover the known most common English words. 
+
+Additionally, synthetic data that is generated from a Zipfian distribution remain Zipfian after many successive steps of BPE. 
 
 \section{Conclusions \& Future Work}
 
-Noticeable theoretical work has been done in service of explaining Zipf's law for language \cite{li1992}. Most significant was Belevitch's \textit{On the statistical laws of linguistic distributions}\cite{Belevitch1959}, in which the author shows the first order approximation of the rank ordering of many statistical distributions are all Zipfian. This indicates that Zipf's law may be due to the rank ordering of words more than the underlying formation of language, which is what Zipf was originally interested in. Can Belevitch's proof be shown to be invariant under the byte pair encoding transformation?
+The BPE algorithm, despite building vocabularies using the most frequent pairings of elements, generates vocabularies that are still Zipfian, up to the rarest few tokens.
+
+Noticeable theoretical work has been done in service of explaining Zipf's law for language \cite{li1992}. Most significant was Belevitch's \textit{On the statistical laws of linguistic distributions}\cite{Belevitch1959}, in which the author shows the first order approximation of the rank ordering of many statistical distributions are all Zipfian. This indicates that Zipf's law may be due to the rank ordering of words more than the underlying formation of language, which is what Zipf was originally interested in. Can Belevitch's proof be shown to be invariant for some number of byte pair encoding transformations?
 
 % Bibliography entries for the entire Anthology, followed by custom entries
 %\bibliography{anthology,custom}

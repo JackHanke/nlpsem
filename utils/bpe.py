@@ -38,7 +38,7 @@ def one_step_of_bpe(
         alphabet_size: int 
         ):
     # count up the number of times every consecutive pair appears
-    stats = get_stats(ids)
+    stats = get_stats(ids=ids)
     # find the pair with the highest count
     pair = max(stats, key=stats.get)
     # mint a new token: assign it the next available id
