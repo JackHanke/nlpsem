@@ -120,19 +120,19 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-A majority of large language models ingest word fragments produced by an algorithm known as byte pair encoding. This algorithm groups high-frequency element pairings in natural language into individual units called \textit{tokens}. A natural question is whether the frequency distribution of the tokens produced by this pairing deviate significantly from the source language's. Zipf showed that many natural language's frequency distribution follow a power law, commonly known as Zipf's Law. We examine two modern tokenizer's adherence to Zipf's law at the token level. We provide empirical evidence that these tokenizers are Zipfian on two corpuses, and speculate as to why this is. Additionally, we give evidence that Zipfness is preserved over many individual steps of byte pair encoding.
+A majority of large language models ingest word fragments produced by an algorithm known as byte pair encoding. This algorithm groups high-frequency element pairings in natural language into individual units called \textit{tokens}. A natural question is whether the frequency distribution of the tokens produced by this pairing deviate significantly from the source language's distribution Zipf showed that many natural languages' frequency distribution follow a power law, commonly known as Zipf's Law. We examine two modern tokenizers' adherence to Zipf's law at the token level. We provide empirical evidence that these tokenizers are Zipfian on two corpora, and speculate as to why this is. Additionally, we give evidence that Zipfness is preserved over many individual steps of byte pair encoding.
 \end{abstract}
 
 \section{Introduction}
 \label{section:intro}
 
-George Zipf, in \textit{The Psycho-Biology of Language} \cite{Zip35} introduced the trend that the number of occurences of a word, the word's \textit{frequency}, exhibits a power law. Specifically, Zipf said the word frequency in a corpus is proportional to the word's frequency rank, that being
+George Zipf, in \textit{The Psycho-Biology of Language} \cite{Zip35} introduced the trend that the number of occurrences of a word, the word's \textit{frequency}, exhibits a power law. Specifically, Zipf said the word frequency in a corpus is proportional to the word's frequency rank, that being
 
 \begin{equation}
     \mbox{word frequency} \propto \frac{1}{\mbox{word rank}}.
 \end{equation}
 
-For example, Zipf's law predicts that the second most frequent word will be half as common as the most frequenct word. A more descriptive model of word frequency that is more commonly referenced in linguistics literature is the Zipf-Mandelbrot distribution, written
+For example, Zipf's law predicts that the second most frequent word will be half as common as the most frequent word. A more descriptive model of word frequency that is more commonly referenced in linguistics literature is the Zipf-Mandelbrot distribution, written
 
 \begin{equation}
     \mbox{word frequency} \propto \frac{1}{(\mbox{word rank} + b)^a}, 
@@ -141,11 +141,11 @@ For example, Zipf's law predicts that the second most frequent word will be half
 
 where $a,b$ are fitted parameters. We say a distribution that follows the trend in Equation \ref{eq:zipfmandelbrot} with $a \approx 1$ is \textit{Zipf distributed}, or simply \textit{Zipfian}.
 
-The accuracy of the trend in Equation \ref{eq:zipfmandelbrot} has been examined in $10^8$ English words in \cite{cancho2000}, over 50 languages in \cite{yu2018zipfslaw50languages}, and written-versus-spoken corpuses in \cite{lin2015scalinglawshumanspeech}. Each of these studies demonstrate that Zipf's law is generally exhibitted for common and somewhat-uncommon words, but rare words (words with high rank) appear less frequently than predicted. This deviation is shown to be statistically significant, and appears as two linear trends in log-log rank frequency plots. In English text, this transition is found around the $10^4$\textit{-th} ranked word \cite{cancho2000} \cite{yu2018zipfslaw50languages}. The authors further explore the linguistic relevance and universality of these multiple trends. 
+The accuracy of the trend in Equation \ref{eq:zipfmandelbrot} has been examined in $10^8$ English words in \cite{cancho2000}, over 50 languages in \cite{yu2018zipfslaw50languages}, and written-versus-spoken corpuses in \cite{lin2015scalinglawshumanspeech}. Each of these studies demonstrate that Zipf's law is generally exhibited for common and somewhat-uncommon words, but rare words (words with high rank) appear less frequently than predicted. This deviation is shown to be statistically significant, and appears as two linear trends in log-log rank frequency plots. In English text, this transition is found around the $10^4$\textit{-th} ranked word \cite{cancho2000} \cite{yu2018zipfslaw50languages}. The authors further explore the linguistic relevance and universality of these multiple trends. 
 
-Nearly a century after Zipf's discovery, large language models (LLMs) generate text comparable to human communication \cite{llmturingtest}. LLMs digest text using a fixed vocabulary of word fragments called \textit{tokens}. The mapping between natural language and tokens is most commonly computed using the \textit{byte pair encoding algorithm (BPE)}. BPE was introduced by Gage \cite{bpegage} for file compression, and later adapted for use in natural laguage processing by \cite{sennrich2016neuralmachinetranslationrare}. The NLP version of BPE, instead of seeking to optimally compress a corpus of text into a vocabulary of any size, instead maps a corpus to a small fixed vocabulary. In this paper, we consider the natural language processing variant of the algorithm. 
+Nearly a century after Zipf's discovery, large language models (LLMs) generate text comparable to human communication \cite{llmturingtest}. LLMs digest text using a fixed vocabulary of word fragments called \textit{tokens}. The mapping between natural language and tokens is most commonly computed using the \textit{byte pair encoding algorithm (BPE)}. BPE was introduced by Gage \cite{bpegage} for file compression, and later adapted for use in natural language processing by \cite{sennrich2016neuralmachinetranslationrare}. The NLP version of BPE, instead of seeking to optimally compress a corpus of text into a vocabulary of any size, instead maps a corpus to a small fixed vocabulary. In this paper, we consider the natural language processing variant of the algorithm. 
 
-BPE also requires specifying the \textit{elements} of a corpus, which are the portion of the text that is considered a indivisible chunk of the text. Elements can be words, phonemes, or letters. Modern tokenizers use the bytes of the Unicode representation as the elements, and so are called \textit{byte-level} BPE tokenizers \cite{radford2019language}. 
+BPE also requires specifying the \textit{elements} of a corpus, which are the portion of the text that is considered an indivisible chunk of the text. Elements can be words, phonemes, or letters. Modern tokenizers use the bytes of the Unicode representation as the elements, and so are called \textit{byte-level} BPE tokenizers \cite{radford2019language}. 
 
 When considering these ideas in tandem, a natural question arises: given a corpus that appears Zipfian, how does the BPE tokenization process affect this trend?
 
@@ -157,7 +157,7 @@ We examine the 4.4GB bookscorpus dataset \cite{zhu2015aligningbooksmoviesstoryli
 
 We compute the word and token frequency for both tokenizers on each corpus, where we define a word as anything separated by the space character (U+0020). We then compute the data's $\chi^2$ goodness-of-fit statistic for the fitted Zipf distribution, and compare the fit to exponential and log-normal distributions. We do not remove any words or tokens from consideration unless otherwise stated.
 
-Additionally, we create a synthetic dataset of $10^5$ samples from a zipf-distibuted alphabet of size $100$ to examine how the distribution deviates from Zipf over successive steps of BPE. 
+Additionally, we create a synthetic dataset of $10^5$ samples from a zipf-distributed alphabet of size $100$ to examine how the distribution deviates from Zipf over successive steps of BPE. 
 
 \section{Results}
 
@@ -239,7 +239,7 @@ Finally, we compute the mean squared error (MSE) between the Zipfian prediction 
 
 \section{Analysis}
 
-In general, we find strong evidence that BPE tokenizers are Zipfian. Deviations from the Zipfian trend only appear for the final few RoBERTa tokens for both corpuses and the GPT-4o tokens for the MiniPile corpus. This includes in and out-of-distribution text. However, the GPT-4o tokenizer trend on the bookscorpus seems to deviate more dramatically, similar to the multiple regime studies mentioned in Section \ref{section:intro}. We speculate that this may be due to Minipile being a multilingual dataset, which may affect the the distribution for a multilingual tokenizer such as GPT-4o. The $\chi^2$ goodness-of-fit tests confirm a Zipf describes the data well, all having p-values $<<0.0001$. 
+In general, we find strong evidence that BPE tokenizers are Zipfian. Deviations from the Zipfian trend only appear for the final few RoBERTa tokens for both corpuses and the GPT-4o tokens for the MiniPile corpus. This includes in and out-of-distribution text. However, the GPT-4o tokenizer trend on the bookscorpus seems to deviate more dramatically, similar to the multiple regime studies mentioned in Section \ref{section:intro}. We speculate that this may be due to Minipile being a multilingual dataset, which may affect the distribution for a multilingual tokenizer such as GPT-4o. The $\chi^2$ goodness-of-fit tests confirm a Zipf describes the data well, all having p-values $<<0.0001$. 
 
 Over the token vocabulary, the most common tokens tend to be punctuation, newline characters, and control tokens. Excluding punctuation and special tokens, we recover the known most common English words.
 
@@ -247,7 +247,7 @@ Additionally, applying the BPE pairing process to the synthetic data shows almos
 
 \section{Conclusions \& Future Work}
 
-The byte pair encoding algorithm, despite building vocabularies using the most frequent pairings of elements, generates vocabularies that are Zipfian, up to the rarest few tokens. We demonstate this over multiple tokenizers and corpuses, including both in and out-of-distribution text. We also provide empirical evidence that Zipfness is preserved over many iterations of BPE.
+The byte pair encoding algorithm, despite building vocabularies using the most frequent pairings of elements, generates vocabularies that are Zipfian, up to the rarest few tokens. We demonstrate this over multiple tokenizers and corpuses, including both in and out-of-distribution text. We also provide empirical evidence that Zipfness is preserved over many iterations of BPE.
 
 Noticeable theoretical work has been done to explain Zipf's law for language \cite{li1992}. Most significant was Belevitch's \textit{On the statistical laws of linguistic distributions}\cite{Belevitch1959}, in which the author shows the first order approximation of the rank ordering of many statistical distributions are all Zipfian. This indicates that Zipf's law may be due to the rank ordering of words more than the underlying formation of language. Can Belevitch's proof be shown to be invariant for some number of byte pair encoding transformations?
 
